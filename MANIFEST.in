@@ -1,0 +1,2 @@
+recursive-include xterm/static *
+recursive-include xterm/templates *
