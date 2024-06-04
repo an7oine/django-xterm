@@ -9,6 +9,7 @@ import os
 import struct
 import termios
 
+from django import forms
 from django.http import HttpResponse
 from django.views import generic
 
@@ -24,6 +25,20 @@ class XtermNakyma(WebsocketNakyma, generic.TemplateView):
   Käyttöliittymän luontiin käytetään Xterm.JS-vimpainta.
   '''
   template_name = 'xterm/xterm.html'
+
+  media = forms.widgets.Media(
+    css={'all': [
+      'https://unpkg.com/xterm@4.5.0/css/xterm.css',
+    ]},
+    js=[
+      # pylint: disable=line-too-long
+      'https://unpkg.com/xterm@4.5.0/lib/xterm.js',
+      'https://unpkg.com/xterm-addon-fit@0.3.0/lib/xterm-addon-fit.js',
+      'https://unpkg.com/xterm-addon-web-links@0.3.0/lib/xterm-addon-web-links.js',
+      'https://unpkg.com/xterm-addon-search@0.6.0/lib/xterm-addon-search.js',
+      'xterm/js/xterm.js',
+    ],
+  )
 
   class js_bool(int):
     ''' Näytetään totuusarvot javascript-muodossa: true/false. '''
