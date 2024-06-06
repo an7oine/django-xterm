@@ -42,13 +42,14 @@
       term.loadAddon(new SearchAddon.SearchAddon());
       term.open(document.getElementById('xterm'));
       fit.fit()
-      term.onKey(function(e) {
-        websocket.send(new Blob([e.key]));
+      term.onData(function (data) {
+        websocket.send(new Blob(data.split()));
       });
 
       websocket = new WebSocket(url);
       websocket.onopen = function () {
         resolve(websocket);
+        setTimeout(fitToScreen, 0);
       };
       websocket.onmessage = function (e) {
         term.write(e.data)
