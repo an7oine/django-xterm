@@ -9,16 +9,29 @@ import os
 import struct
 import termios
 
-from django import forms
 from django.http import HttpResponse
 from django.views import generic
 
+from django_sivumedia import JSBool
 from pistoke.nakyma import WebsocketNakyma
 
 from .paate import Paateprosessi
+from .vimpain import (
+  XtermJS,
+  XtermAddonFit,
+  XtermAddonSearch,
+  XtermAddonWebLinks,
+)
 
 
-class XtermNakyma(WebsocketNakyma, generic.TemplateView):
+class XtermNakyma(
+  XtermAddonFit,
+  XtermAddonSearch,
+  XtermAddonWebLinks,
+  XtermJS,
+  WebsocketNakyma,
+  generic.TemplateView
+):
   '''
   Django-näkymä vuorovaikutteisen Websocket-yhteyden tarjoamiseen.
 
@@ -26,30 +39,13 @@ class XtermNakyma(WebsocketNakyma, generic.TemplateView):
   '''
   template_name = 'xterm/xterm.html'
 
-  media = forms.widgets.Media(
-    css={'all': [
-      'https://unpkg.com/xterm@4.5.0/css/xterm.css',
-    ]},
-    js=[
-      # pylint: disable=line-too-long
-      'https://unpkg.com/xterm@4.5.0/lib/xterm.js',
-      'https://unpkg.com/xterm-addon-fit@0.3.0/lib/xterm-addon-fit.js',
-      'https://unpkg.com/xterm-addon-web-links@0.3.0/lib/xterm-addon-web-links.js',
-      'https://unpkg.com/xterm-addon-search@0.6.0/lib/xterm-addon-search.js',
-      'xterm/js/xterm.js',
-    ],
-  )
-
-  class js_bool(int):
-    ''' Näytetään totuusarvot javascript-muodossa: true/false. '''
-    def __repr__(self):
-      return repr(bool(self)).lower()
-    # class js_bool
+  class Media:
+    js = ['xterm/js/xterm.js']
 
   # Xterm-ikkunan alustusparametrit.
   xterm = {
-    'cursorBlink': js_bool(True),
-    'macOptionIsMeta': js_bool(False),
+    'cursorBlink': JSBool(True),
+    'macOptionIsMeta': JSBool(False),
     'scrollback': 5000,
   }
 
@@ -112,6 +108,7 @@ class XtermNakyma(WebsocketNakyma, generic.TemplateView):
   async def websocket(self, request, *args, **kwargs):
     # pylint: disable=unused-argument
     lahetettava_data = asyncio.Queue()
+
     def tulosteen_vastaanotto(prosessi):
       '''
       Callback-tyyppinen rutiini datan lukemiseksi PTY:ltä.
