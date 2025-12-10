@@ -51,6 +51,10 @@
         resolve(websocket);
         setTimeout(fitToScreen, 0);
       };
+      websocket.onclose = function (e) {
+        if (e.code > 1001)
+          term.write(`\033[31mYhteys katkesi (${e.code})!\033[0m`)
+      };
       websocket.onmessage = function (e) {
         term.write(e.data)
       };
