@@ -53,7 +53,7 @@
       };
       websocket.onclose = function (e) {
         if (e.code > 1001)
-          term.write(`\033[31mYhteys katkesi (${e.code})!\033[0m`)
+          term.write(`\x1B[31mYhteys katkesi (${e.code})!\x1B[0m`)
       };
       websocket.onmessage = function (e) {
         term.write(e.data)
