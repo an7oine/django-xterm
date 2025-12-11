@@ -33,7 +33,7 @@
       if (term)
         term.dispose();
       if (websocket)
-        websocket.close();
+        websocket.close(1000);  // Normaali katkaisu.
 
       term = new Terminal(asetukset);
       fit = new FitAddon.FitAddon();
@@ -52,8 +52,8 @@
         setTimeout(fitToScreen, 0);
       };
       websocket.onclose = function (e) {
-        if (e.code > 1001)
-          term.write(`\x1B[31mYhteys katkesi (${e.code})!\x1B[0m`)
+        if (e.code > 1001)  // Muu kuin normaali katkaisu.
+          term.write(`\r\n\x1B[31mYhteys katkesi (${e.code})!\x1B[0m`)
       };
       websocket.onmessage = function (e) {
         term.write(e.data)
